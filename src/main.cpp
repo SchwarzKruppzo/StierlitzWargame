@@ -332,6 +332,8 @@ void OnDetach(HMODULE hModule) {
 			FreeLibraryAndExitThread(hModule, 0);
 			ExitThread(0);
 		}
+
+		Sleep(100);
 	}
 }
 
@@ -403,19 +405,19 @@ void __stdcall MainThread(HMODULE hModule) {
 		DWORD gameBase = *(DWORD*)(dwBaseAddress + 0xBED0C4);
 
 		bIsInGame = (gameBase != NULL);
-	}, 1000);
-	timer.setLoop([]() {
-		if (bIsInGame && activated.fog) {
-			*((DWORD*)dwFogPointer) = 0;
-		}
-	}, 1);
-	timer.setLoop([]() {
-		if (bIsInGame && activated.camera) {
-			*((DWORD*)dwCameraPointer) = 0;
-		}
-	}, 1);
-	timer.setLoop(ScopeFreezer, 1);
 
+		if (bIsInGame) {
+			if (activated.fog) {
+				*((DWORD*)dwFogPointer) = 0;
+			}
+
+			if (activated.camera) {
+				*((DWORD*)dwCameraPointer) = 0;
+			}
+		}
+	}, 1000);
+	timer.setLoop(ScopeFreezer, 10);
+	
 	std::cout << ">Stierlitz is ready!" << std::endl;
 
 	while (true) {
@@ -537,6 +539,8 @@ void __stdcall MainThread(HMODULE hModule) {
 
 		if (bStopThreads) {
 			ExitThread(0);
+		} else {
+			Sleep(25);
 		}
 	}
 }
