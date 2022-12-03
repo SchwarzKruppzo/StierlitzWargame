@@ -1,7 +1,8 @@
-#ifndef _PTIMER_HPP_
-#define _PTIMER_HPP_
+#pragma once
 
 #include <thread>
+
+bool bStopThreads = false;
 
 class pTimer
 {
@@ -33,5 +34,3 @@ public:
 			}).detach();
 	}
 };
-
-#endif

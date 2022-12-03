@@ -1,8 +1,4 @@
-#include <stdio.h>
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include "sigscan.h"
+#include "framework.h"
 
 /* There is no ANSI ustrncpy */
 unsigned char* ustrncpy(unsigned char* dest, const unsigned char* src, int len) {
