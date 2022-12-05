@@ -12,22 +12,26 @@ static const BYTE patchMinimap1[] = { 0x28, 0x69, 0x6E, 0x63, 0x6C, 0x75, 0x64, 
 static const BYTE patchMinimap2[] = { 0x28, 0x69, 0x6E, 0x63, 0x6C, 0x75, 0x64, 0x65, 0x20, 0x22, 0x63, 0x2E, 0x64, 0x64, 0x73, 0x22, 0x29 };
 static const BYTE patchMinimap3[] = { 0x28, 0x69, 0x6E, 0x63, 0x6C, 0x75, 0x64, 0x65, 0x20, 0x22, 0x61, 0x2E, 0x64, 0x64, 0x73, 0x22, 0x29, 0x0D, 0x0A, 0x0D, 0x0A, 0x7B, 0x69, 0x66, 0x20, 0x73, 0x74, 0x75, 0x66, 0x66 };
 static const BYTE sigOrigScope[] = { 0xC7, 0x87, 0xCC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static const BYTE patchUnitTransfer[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
 
 static const DWORD offsetsInf[] = {
 	0x7E76BE,
 	0x7E7717,
 	0x7A5E91,
+	0x7BF2BF,
 	0x7E3FDD,
 	0x7E42AF
 };
 
-static const BYTE sigInfPatch1[6][2] = {
+static const BYTE sigInfPatch1[8][2] = {
 	{0x90, 0x90}, // patch
 	{0x77, 0x13},
 	{0xEB, 0x10},
+	{0xB0, 0x01}, 
 	{0x7A, 0x79}, // restore
 	{0x7A, 0x13},
 	{0x7A, 0x10},
+	{0x32, 0xC0},
 };
 
 static const BYTE sigInfPatch2[4][3] = {
@@ -221,11 +225,11 @@ namespace Hack
 			return;
 
 		if (activated) {
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 6; i++) {
 				DWORD dwAddr = (baseAddress + offsetsInf[i]);
 
-				if (i > 2) {
-					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch2[i % 3], 0x03);
+				if (i > 3) {
+					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch2[i % 4], 0x03);
 				}
 				else {
 					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch1[i], 0x02);
@@ -233,14 +237,14 @@ namespace Hack
 			}
 		}
 		else {
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 6; i++) {
 				DWORD dwAddr = (baseAddress + offsetsInf[i]);
 
-				if (i > 2) {
-					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch2[2 + (i % 3)], 0x03);
+				if (i > 3) {
+					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch2[2 + (i % 4)], 0x03);
 				}
 				else {
-					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch1[3 + (i % 3)], 0x02);
+					Memory::MakePatch((BYTE*)dwAddr, (BYTE*)sigInfPatch1[4 + (i % 4)], 0x02);
 				}
 			}
 		}
@@ -387,6 +391,7 @@ namespace Hack
 
 		Memory::MakeJump((BYTE*)rangePointer, (DWORD)InfiniteRange, 0xC);
 		Memory::MakeJump((BYTE*)scopePointer, (DWORD)ShowScopeCollisionIndicator, 0xA);
+		Memory::MakePatch((BYTE*)(baseAddress + 0x7AB57C), (BYTE*)patchUnitTransfer, 0x6);
 
 		pTimer timer;
 
